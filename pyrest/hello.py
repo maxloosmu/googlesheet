@@ -2,9 +2,9 @@ from flask import Flask, request, send_from_directory, render_template, send_fil
 import sys, string, os, datetime, glob, shutil, subprocess, re, json
 from pathlib import Path
 
-template_dir = "/Users/maxloo/gsheet/pyrest/template/"
-temp_dir = "/Users/maxloo/gsheet/pyrest/temp/"
-static_dir = "/Users/maxloo/gsheet/pyrest/static/"
+template_dir = "/Users/maxloo/googlesheet/pyrest/template/"
+temp_dir = "/Users/maxloo/googlesheet/pyrest/temp/"
+static_dir = "/Users/maxloo/googlesheet/pyrest/static/"
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 
 @app.route("/corel4/<uuid>/<ssid>/<sid>")
@@ -75,7 +75,7 @@ def processCsv():
   uuid = data['uuid']
   spreadsheetId = data['spreadsheetId']
   sheetId = data['sheetId']
-  targetFolder = "/Users/maxloo/gsheet/pyrest/temp/workdir/"+uuid+"/"+spreadsheetId+"/"+sheetId+"/"
+  targetFolder = "/Users/maxloo/googlesheet/pyrest/temp/workdir/"+uuid+"/"+spreadsheetId+"/"+sheetId+"/"
   print(targetFolder)
   timeNow = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%S.%fZ")
   targetFile = timeNow + ".csv"
@@ -87,7 +87,7 @@ def processCsv():
     fout.write(data['csvString'])
 
   # targetPath is for CSV data
-  createFiles = "natural4-exe --workdir=/Users/maxloo/gsheet/pyrest/temp/workdir --uuiddir=" + uuid + "/" + spreadsheetId + "/" + sheetId + " " + targetPath
+  createFiles = "natural4-exe --workdir=/Users/maxloo/googlesheet/pyrest/temp/workdir --uuiddir=" + uuid + "/" + spreadsheetId + "/" + sheetId + " " + targetPath
   # createFiles = "natural4-exe --workdir=/home/mengwong/pyrest/temp/workdir --uuiddir=" + uuid + " --topetri=petri --tojson=json --toaasvg=aasvg --tonative=native --tocorel4=corel4 --tocheckl=checklist  --tots=typescript " + targetPath
   print("hello.py main: calling natural4-exe", file=sys.stderr)
   print("hello.py main: %s" % (createFiles), file=sys.stderr)
@@ -146,7 +146,7 @@ def processCsv():
     #   postprocessing for the vue web server
     #     call v8k up
 
-    v8kargs = ["/Users/maxloo/gsheet/pyrest/bin/python", "/Users/maxloo/vue-pure-pdpa/bin/v8k", "up",
+    v8kargs = ["/Users/maxloo/googlesheet/pyrest/bin/python", "/Users/maxloo/vue-pure-pdpa/bin/v8k", "up",
                "--uuid="    + uuid,
                "--ssid="    + spreadsheetId,
                "--sheetid=" + sheetId,
