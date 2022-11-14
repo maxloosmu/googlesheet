@@ -2,9 +2,12 @@ from flask import Flask, request, send_from_directory, render_template, send_fil
 import sys, string, os, datetime, glob, shutil, subprocess, re, json
 from pathlib import Path
 
-template_dir = "/Users/maxloo/googlesheet/pyrest/template/"
-temp_dir = "/Users/maxloo/googlesheet/pyrest/temp/"
-static_dir = "/Users/maxloo/googlesheet/pyrest/static/"
+# template_dir = "/Users/maxloo/googlesheet/pyrest/template/"
+# temp_dir = "/Users/maxloo/googlesheet/pyrest/temp/"
+# static_dir = "/Users/maxloo/googlesheet/pyrest/static/"
+template_dir = "/mnt/c/Users/Max/src/googlesheet/pyrest/template/"
+temp_dir = "/mnt/c/Users/Max/src/googlesheet/pyrest/temp/"
+static_dir = "/mnt/c/Users/Max/src/googlesheet/pyrest/static/"
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 
 @app.route("/corel4/<uuid>/<ssid>/<sid>")
@@ -75,7 +78,8 @@ def processCsv():
   uuid = data['uuid']
   spreadsheetId = data['spreadsheetId']
   sheetId = data['sheetId']
-  targetFolder = "/Users/maxloo/googlesheet/pyrest/temp/workdir/"+uuid+"/"+spreadsheetId+"/"+sheetId+"/"
+  # targetFolder = "/Users/maxloo/googlesheet/pyrest/temp/workdir/"+uuid+"/"+spreadsheetId+"/"+sheetId+"/"
+  targetFolder = "/mnt/c/Users/Max/src/googlesheet/pyrest/temp/workdir/"+uuid+"/"+spreadsheetId+"/"+sheetId+"/"
   print(targetFolder)
   timeNow = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%S.%fZ")
   targetFile = timeNow + ".csv"
@@ -87,7 +91,8 @@ def processCsv():
     fout.write(data['csvString'])
 
   # targetPath is for CSV data
-  createFiles = "natural4-exe --workdir=/Users/maxloo/googlesheet/pyrest/temp/workdir --uuiddir=" + uuid + "/" + spreadsheetId + "/" + sheetId + " " + targetPath
+  # createFiles = "natural4-exe --workdir=/Users/maxloo/googlesheet/pyrest/temp/workdir --uuiddir=" + uuid + "/" + spreadsheetId + "/" + sheetId + " " + targetPath
+  createFiles = "natural4-exe --workdir=/mnt/c/Users/Max/src/googlesheet/pyrest/temp/workdir --uuiddir=" + uuid + "/" + spreadsheetId + "/" + sheetId + " " + targetPath
   # createFiles = "natural4-exe --workdir=/home/mengwong/pyrest/temp/workdir --uuiddir=" + uuid + " --topetri=petri --tojson=json --toaasvg=aasvg --tonative=native --tocorel4=corel4 --tocheckl=checklist  --tots=typescript " + targetPath
   print("hello.py main: calling natural4-exe", file=sys.stderr)
   print("hello.py main: %s" % (createFiles), file=sys.stderr)
@@ -95,7 +100,7 @@ def processCsv():
   print("hello.py main: back from natural4-exe", file=sys.stderr)
   print("hello.py main: natural4-exe stdout length = %d" % len(nl4exe.stdout.decode('utf-8')), file=sys.stderr)
   print("hello.py main: natural4-exe stderr length = %d" % len(nl4exe.stderr.decode('utf-8')), file=sys.stderr)
-   
+
   if len(nl4exe.stderr.decode('utf-8')) < 2000:
     print (nl4exe.stderr.decode('utf-8'))
   nl4_out = nl4exe.stdout.decode('utf-8')
@@ -103,7 +108,7 @@ def processCsv():
   response['nl4_stderr'] = nl4exe.stderr.decode('utf-8')[:20000]
   response['nl4_stdout'] = nl4exe.stdout.decode('utf-8')[:20000]
 
-  # 
+  #
   # postprocessing after running natural4-exe:
   #   postprocessing for petri nets:
   #     turn the DOT files into PNGs
@@ -129,7 +134,7 @@ def processCsv():
     except Exception as e:
       print("hello.py main: got some kind of OS error to do with the unlinking and the symlinking", file=sys.stderr);
       print("hello.py main: %s" % (e), file=sys.stderr);
-    
+
     #   postprocessing for the babyl4 downstream transpilations
     #     call l4 epilog corel4/LATEST.l4
 
@@ -146,12 +151,13 @@ def processCsv():
     #   postprocessing for the vue web server
     #     call v8k up
 
-    v8kargs = ["/Users/maxloo/googlesheet/pyrest/bin/python", "/Users/maxloo/vue-pure-pdpa/bin/v8k", "up",
+    # v8kargs = ["/Users/maxloo/googlesheet/pyrest/bin/python", "/Users/maxloo/vue-pure-pdpa/bin/v8k", "up",
+    v8kargs = ["/mnt/c/Users/Max/src/googlesheet/pyrest/bin/python", "/root/src/vue-pure-pdpa/bin/v8k", "up",
                "--uuid="    + uuid,
                "--ssid="    + spreadsheetId,
                "--sheetid=" + sheetId,
                uuidssfolder + "/purs/LATEST.purs"]
-    
+
     print("hello.py main: calling %s" % (" ".join(v8kargs)), file=sys.stderr)
 # v8k = subprocess.run(v8kargs,
 #                            stdout=subprocess.PIPE,
@@ -164,7 +170,7 @@ def processCsv():
     print("v8k.out: %s" % (v8k_out), file=sys.stderr)
 
     # v8k_out = v8k.stdout.decode('utf-8')
-    
+
     if re.match(r':\d+', v8k_out): # we got back the expected :8001/uuid/ssid/sid whatever from the v8k call
       v8k_url = v8k_out.strip()
       print("v8k up succeeded with: " + v8k_url, file=sys.stderr)
@@ -175,12 +181,12 @@ def processCsv():
       #      v8k_error = v8k.stderr.decode('utf-8')
       #      print("hello.py main: v8k up stderr: " + v8k_error,                  file=sys.stderr)
       #      print("hello.py main: v8k up stdout: " + v8k.stdout.decode('utf-8'), file=sys.stderr)
-      
+
     with open(uuidssfolder + "/aasvg/LATEST/index.html", "r") as read_file:
       response['aasvg_index'] = read_file.read();
 
   response['timestamp'] = timestamp;
-  
+
   print("hello.py main: returning", file=sys.stderr)
   # print(json.dumps(response), file=sys.stderr)
   return json.dumps(response)
